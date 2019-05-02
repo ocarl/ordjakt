@@ -1,16 +1,19 @@
 import os
+import random
+from collections import defaultdict
 
 
 class Player:
-    answers = []
+    answers = defaultdict(lambda: [])
     score = 0
 
-    def choose(self, answer):
-        self.answers.append(answer)
+    def choose(self, category, answer):
+        self.answers[category].append(answer)
 
 
 class Game:
-    letter = 's'
+    alphabet = 'abcdefghijklmnopqrstuvxyzåäö'
+    letter = alphabet[random.randint(0,len(alphabet)-1)]
     series = [
              'actor',
              'scientist',
@@ -28,17 +31,18 @@ class Game:
         for category in self.series:
             for player in self.players:
                 answer = input('Choose and {} starting on the letter {}: '.format(category, self.letter))
-                player.choose(answer.lower())
+                player.choose(category, answer.lower())
                 os.system('clear')
         
-        all_answers = []
+        all_answers = defaultdict(lambda: [])
 
         for player in self.players:
-            all_answers.extend(player.answers)
+            for category in self.series:
+                all_answers[category].extend(player.answers)
 
         for player in self.players:
-            for answer in player.answers:
-                occurences = all_answers.count(answer)
+            for category, answers in all_answers.items():
+                occurences = answers.count(player.answers[category])
                 player.score += no_of_players - occurences + 1
 
         for i, player in enumerate(self.players):
@@ -48,7 +52,10 @@ class Game:
 
 if __name__=='__main__':
     game = Game()
-    game.run()
+    try:
+        game.run()
+    except Exception as e:
+        print(str(e))
 
 
 
